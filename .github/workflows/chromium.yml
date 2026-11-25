@@ -43,6 +43,37 @@ jobs:
             await page.locator('#language').selectOption('en');
             await page.locator('#price').fill('2000'); await page.locator('#discount').fill('25'); assert.equal(await page.locator('#total').innerText(),'RD$ 1500.00');
             await page.locator('#income').fill('25000'); await page.locator('#expenses').fill('21000'); assert.equal(await page.locator('#balance').innerText(),'RD$ 4000.00'); await page.locator('#pack').fill('180'); await page.locator('#grams').fill('500'); assert.equal(await page.locator('#unit').innerText(),'RD$ 360.00 / kg'); await page.locator('#grams').fill('0'); assert.equal(await page.locator('#unit').innerText(),'—'); assert.equal(await page.locator('#more-items p').count(),7);
+            assert.ok((await page.locator('#compare-result').innerText()).includes('Cheaper per kg: B'));
+            await page.locator('#b-price').fill('360');
+            assert.ok((await page.locator('#compare-result').innerText()).includes('Same unit price'));
+            await page.locator('#b-weight').fill('0');
+            assert.equal(await page.locator('#compare-result').innerText(),'Check inputs');
+            await page.locator('#b-weight').fill('1000');
+            await page.locator('#b-price').fill('400');
+            assert.ok((await page.locator('#compare-result').innerText()).includes('Cheaper per kg: A'));
+            assert.equal(await page.locator('#catalogue-list article').count(),7);
+            assert.equal(await page.locator('#rice-list p').count(),7);
+            assert.ok((await page.locator('#catalogue-list article').first().innerText()).includes('5.6%'));
+            assert.ok((await page.locator('#catalogue-note').innerText()).includes('unconfirmed'));
+            assert.equal(await page.locator('#milk-list p').count(),5);
+            assert.equal(await page.locator('[data-shopping-quantity]').count(),19);
+            await page.locator('#shop-store').selectOption('Sirena');
+            assert.equal(await page.locator('#shopping-items label:not([hidden])').count(),5);
+            await page.locator('#shop-search').fill('Milex');
+            assert.equal(await page.locator('#shopping-items label:not([hidden])').count(),3);
+            await page.locator('#shop-search').fill('');
+            await page.locator('#shop-store').selectOption('');
+            await page.locator('[data-shopping-quantity]').first().fill('2');
+            assert.ok((await page.locator('#shopping-total').innerText()).includes('439.90'));
+            await page.reload();
+            assert.equal(await page.locator('[data-shopping-quantity]').first().inputValue(),'2');
+            await page.locator('#shop-budget').fill('1000');
+            await page.reload();
+            assert.equal(await page.locator('#shop-budget').inputValue(),'1000');
+            assert.ok((await page.locator('#shop-remaining').innerText()).includes('560.10'));
+            await page.locator('#shop-budget').fill('');
+            await page.locator('#shopping-clear').click();
+            assert.ok((await page.locator('#shopping-total').innerText()).includes('0.00'));
             await page.clock.setFixedTime(new Date('2026-11-25T03:59:00Z'));
             await page.reload();
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"][data-status="active"]').count(),6);
@@ -55,10 +86,21 @@ jobs:
             await page.clock.setFixedTime(new Date('2026-12-01T04:00:00Z'));
             await page.reload();
             assert.equal(await page.locator('#offer-list article').count(),0);
+            for(const lang of ['de','es','en','fr','pt']){
+              await page.goto(origin+'/'+lang+'/');
+              assert.equal(await page.locator('#partners-link').getAttribute('href'),'/'+lang+'/partners/');
+              await page.locator('#partners-link').click();
+              assert.equal(await page.locator('html').getAttribute('lang'),lang);
+              assert.equal(await page.locator('#partner-cards .project').count(),8);
+              assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'),'https://example.com/'+lang+'/partners/');
+              assert.equal(await page.locator('link[hreflang]').count(),6);
+              assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+            }
             assert.deepEqual(errors,[]);
             await page.close();
           }
           const xml=readFileSync('public/sitemap.xml','utf8');
+          for(const l of ['de','es','en','fr','pt'])assert.ok(xml.includes('https://example.com/'+l+'/partners/'));
           for(const l of ['de','es','en','fr','pt'])assert.ok(xml.includes('https://example.com/'+l+'/'));
           assert.ok(readFileSync('public/robots.txt','utf8').includes('https://example.com/sitemap.xml'));
           } finally {await browser.close();server.close()}
