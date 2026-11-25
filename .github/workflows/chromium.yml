@@ -86,6 +86,16 @@ jobs:
             await page.clock.setFixedTime(new Date('2026-12-01T04:00:00Z'));
             await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
             assert.equal(await page.locator('#offer-list article').count(),0);
+            await page.clock.setFixedTime(new Date('2026-12-02T04:00:00Z'));
+            await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
+            for(const id of ['rice-note','catalogue-note','milk-note','shopping-note']){
+              assert.equal(await page.locator('#'+id).getAttribute('data-price-age'),'7');
+              assert.ok((await page.locator('#'+id).innerText()).includes('Older price observation'));
+            }
+            assert.equal(await page.locator('[data-shopping-quantity]').count(),19);
+            await page.clock.setFixedTime(new Date('2026-11-24T04:00:00Z'));
+            await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
+            assert.equal(await page.locator('#shopping-note').getAttribute('data-price-age'),'unknown');
             for(const lang of ['de','es','en','fr','pt']){
               await page.goto(origin+'/'+lang+'/');
               assert.equal(await page.locator('#partners-link').getAttribute('href'),'/'+lang+'/partners/');
