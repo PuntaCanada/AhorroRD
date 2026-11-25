@@ -42,6 +42,7 @@ jobs:
             }
             await page.locator('#language').selectOption('en');
             await page.locator('#price').fill('2000'); await page.locator('#discount').fill('25'); assert.equal(await page.locator('#total').innerText(),'RD$ 1500.00');
+            await page.locator('#income').fill('25000'); await page.locator('#expenses').fill('21000'); assert.equal(await page.locator('#balance').innerText(),'RD$ 4000.00'); await page.locator('#pack').fill('180'); await page.locator('#grams').fill('500'); assert.equal(await page.locator('#unit').innerText(),'RD$ 360.00 / kg'); await page.locator('#grams').fill('0'); assert.equal(await page.locator('#unit').innerText(),'—'); assert.equal(await page.locator('#more-items p').count(),7);
             assert.deepEqual(errors,[]);
             await page.close();
           }
