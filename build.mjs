@@ -1,3 +1,4 @@
+import {buildPartners} from './partners.mjs';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 const html=readFileSync('public/index.html','utf8');
 const langs=['de','es','en','fr','pt'];
@@ -13,4 +14,5 @@ let page=html.replace('<html lang="es">','<html lang="'+l+'">').replace(/<title>
 writeFileSync('public/'+l+'/index.html',page);
 }
 writeFileSync('public/robots.txt','User-agent: *\nAllow: /\n'+(origin?'Sitemap: '+origin+'/sitemap.xml\n':''));
-if(origin)writeFileSync('public/sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+langs.map(l=>'<url><loc>'+origin+'/'+l+'/</loc></url>').join('')+'</urlset>');
+const partnerPages=buildPartners(origin);
+if(origin)writeFileSync('public/sitemap.xml','<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+[...langs.map(l=>'/'+l+'/'),...partnerPages].map(p=>'<url><loc>'+origin+p+'</loc></url>').join('')+'</urlset>');
