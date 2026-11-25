@@ -79,12 +79,12 @@ jobs:
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"][data-status="active"]').count(),6);
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"][data-status="upcoming"]').count(),1);
             await page.clock.setFixedTime(new Date('2026-11-26T04:00:00Z'));
-            await page.reload();
+            await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"][data-status="upcoming"]').count(),0);
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"]').count(),6);
             assert.ok(!(await page.locator('#offer-list').innerText()).includes('Bennu')); for(const name of ['Punto Mac','KLIQUEA','Ophelia Original']) assert.ok((await page.locator('#offer-list').innerText()).includes(name));
             await page.clock.setFixedTime(new Date('2026-12-01T04:00:00Z'));
-            await page.reload();
+            await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
             assert.equal(await page.locator('#offer-list article').count(),0);
             for(const lang of ['de','es','en','fr','pt']){
               await page.goto(origin+'/'+lang+'/');
