@@ -51,6 +51,10 @@ jobs:
             await page.locator('#b-weight').fill('1000');
             await page.locator('#b-price').fill('400');
             assert.ok((await page.locator('#compare-result').innerText()).includes('Cheaper per kg: A'));
+            assert.equal(await page.locator('#catalogue-list article').count(),7);
+            assert.equal(await page.locator('#rice-list p').count(),7);
+            assert.ok((await page.locator('#catalogue-list article').first().innerText()).includes('5.6%'));
+            assert.ok((await page.locator('#catalogue-note').innerText()).includes('unconfirmed'));
             await page.clock.setFixedTime(new Date('2026-11-25T03:59:00Z'));
             await page.reload();
             assert.equal(await page.locator('#offer-list article[data-bank="caribe"][data-status="active"]').count(),6);
