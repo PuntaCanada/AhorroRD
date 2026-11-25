@@ -67,6 +67,11 @@ jobs:
             assert.ok((await page.locator('#shopping-total').innerText()).includes('439.90'));
             await page.reload();
             assert.equal(await page.locator('[data-shopping-quantity]').first().inputValue(),'2');
+            await page.locator('#shop-budget').fill('1000');
+            await page.reload();
+            assert.equal(await page.locator('#shop-budget').inputValue(),'1000');
+            assert.ok((await page.locator('#shop-remaining').innerText()).includes('560.10'));
+            await page.locator('#shop-budget').fill('');
             await page.locator('#shopping-clear').click();
             assert.ok((await page.locator('#shopping-total').innerText()).includes('0.00'));
             await page.clock.setFixedTime(new Date('2026-11-25T03:59:00Z'));
